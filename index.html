@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Daptomycin Compounding Tracker</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    :root {
+      --primary: #007acc;
+      --accent: #d9eaff;
+      --bg: #f4f7fa;
+      --text: #333;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+    }
+
+    .app {
+      padding: 20px;
+      max-width: 1280px;
+      margin: auto;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: linear-gradient(135deg, var(--primary), #66bfff);
+      padding: 16px 24px;
+      color: white;
+      border-radius: 12px;
+      margin-bottom: 20px;
+    }
+
+    .container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+
+    .video-section, .info-section {
+      background: white;
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    #videoWrapper {
+      overflow: hidden;
+      position: relative;
+      max-height: 400px;
+      border: 2px solid var(--accent);
+      border-radius: 10px;
+    }
+
+    video {
+      width: 100%;
+      max-width: 100%;
+      max-height: 100%;
+      transform: scale(1);
+      transform-origin: center;
+      transition: transform 0.2s ease;
+    }
+
+    .button-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .button-group button, .task-capture-btn {
+      padding: 10px 16px;
+      font-size: 14px;
+      border: none;
+      border-radius: 8px;
+      background-color: var(--primary);
+      color: white;
+      cursor: pointer;
+    }
+
+    .input-card {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin-bottom: 16px;
+      width: 100%;
+    }
+
+    .input-card input,
+    .input-card textarea,
+    .input-card input[type='range'] {
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .preview-section {
+      grid-column: span 2;
+      margin-top: 24px;
+    }
+
+    .preview-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .img-wrapper {
+      position: relative;
+      border: 2px solid var(--accent);
+      border-radius: 10px;
+      overflow: hidden;
+      width: 180px;
+      height: 130px;
+    }
+
+    .img-wrapper img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      cursor: zoom-in;
+    }
+
+    .delete-btn {
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      background: red;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      font-size: 16px;
+      line-height: 24px;
+      text-align: center;
+      cursor: pointer;
+    }
+
+    #status {
+      margin-top: 6px;
+      font-weight: 600;
+    }
+
+    #zoomModal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.9);
+      z-index: 9999;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #zoomedImage {
+      width: 75vw;
+      height: auto;
+      max-height: 75vh;
+      border: 4px solid white;
+      border-radius: 12px;
+      object-fit: contain;
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Dark Mode CSS */
+    body.dark {
+      background-color: #1e1e2f;
+      color: #e0e0e0;
+    }
+
+    body.dark .video-section,
+    body.dark .info-section {
+      background-color: #2c2c3c;
+      color: white;
+    }
+
+    body.dark input,
+    body.dark textarea,
+    body.dark select {
+      background-color: #444;
+      color: #fff;
+      border: 1px solid #888;
+    }
+
+    body.dark label {
+      color: #ddd;
+    }
+
+    body.dark h1,
+    body.dark h2,
+    body.dark h3 {
+      color: #fff;
+    }
+
+    body.dark #zoomModal {
+      background: rgba(0, 0, 0, 0.95);
+    }
+
+    body.dark .button-group button,
+    body.dark .task-capture-btn {
+      background-color: #444;
+      color: #fff;
+    }
+
+    body.dark .img-wrapper {
+      border-color: #555;
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <h1>Compounding Log</h1>
+      <button id="toggleTheme">Toggle Theme</button>
+    </header>
+    <main class="container">
+      <section class="video-section">
+        <div id="videoWrapper">
+          <video id="video" autoplay></video>
+        </div>
+      </section>
+      <section class="info-section">
+        <div style="display: flex; flex-direction: column; align-items: flex-start;">
+          <div class="input-card">
+            <label>Patient Name</label>
+            <input type="text" id="ptName" placeholder="Enter patient name" />
+          </div>
+          <div class="input-card">
+            <label>Technician Name</label>
+            <input type="text" id="techName" placeholder="Enter your name" />
+          </div>
+          <div class="input-card">
+            <label>Date of Birth</label>
+            <input type="date" id="dob" />
+          </div>
+          <div class="input-card">
+            <label>Notes</label>
+            <textarea id="notes" placeholder="Optional notes..." rows="2"></textarea>
+          </div>
+        </div>
+        <h3>Step-by-Step</h3>
+        <div id="taskDisplay" class="input-card">
+          <label id="taskText">Loading...</label>
+          <button id="captureStep" class="task-capture-btn">Capture for this step</button>
+        </div>
+        <div class="button-group">
+          <button id="prevTask">Previous</button>
+          <button id="nextTask">Next</button>
+        </div>
+        <div class="input-card">
+          <label for="zoomSlider">Zoom</label>
+          <input type="range" id="zoomSlider" min="1" max="3" step="0.1" value="1" />
+          <span id="zoomValue">1.0Ã</span>
+        </div>
+        <div class="button-group">
+          <button id="upload" style="display:none;">Upload First</button>
+          <button id="download" style="display:none;">Export PDF</button>
+        </div>
+        <p id="status"></p>
+      </section>
+      <section class="preview-section">
+        <h2>Captured Images (<span id="count">0</span>/6)</h2>
+        <div id="imagePreviews" class="preview-grid"></div>
+      </section>
+    </main>
+    <div id="zoomModal">
+      <img id="zoomedImage" />
+    </div>
+    <canvas id="canvas" style="display:none;"></canvas>
+  </div>
+
+  <script>
+    const video = document.getElementById("video");
+    const canvas = document.getElementById("canvas");
+    const uploadBtn = document.getElementById("upload");
+    const downloadBtn = document.getElementById("download");
+    const imagePreviews = document.getElementById("imagePreviews");
+    const status = document.getElementById("status");
+    const countSpan = document.getElementById("count");
+
+    const techNameInput = document.getElementById("techName");
+    const ptNameInput = document.getElementById("ptName");
+    const dobInput = document.getElementById("dob");
+    const notesInput = document.getElementById("notes");
+
+    const taskText = document.getElementById("taskText");
+    const captureStepBtn = document.getElementById("captureStep");
+    const prevBtn = document.getElementById("prevTask");
+    const nextBtn = document.getElementById("nextTask");
+
+    const zoomModal = document.getElementById("zoomModal");
+    const zoomedImage = document.getElementById("zoomedImage");
+
+    const zoomSlider = document.getElementById("zoomSlider");
+    const zoomValue = document.getElementById("zoomValue");
+
+    const toggleThemeBtn = document.getElementById("toggleTheme");
+
+    const tasks = [
+      
+  "Capture image of supplies: drug vial and IV bag side by side",
+  "Capture image of expiration dates on both vial and IV bag",
+  "Draw 10 mL of 0.9% NaCl into syringe, capture image showing syringe volume",
+  "Inject 10 mL NaCl into drug vial to reconstitute, capture image of vial with empty syringe next to it",
+  "Draw 10 mL of the reconstituted drug into syringe, capture image showing filled syringe",
+  "Inject the 10 mL drug into IV bag, apply label, capture image of final labeled IV bag",
+  
+
+    ];
+
+    let currentTask = 0;
+    let capturedImages = [];
+
+    navigator.mediaDevices.getUserMedia({ video: true })
+      .then(stream => { video.srcObject = stream; })
+      .catch(err => alert(" Camera access error: " + err));
+
+    zoomSlider.oninput = () => {
+      const zoom = parseFloat(zoomSlider.value);
+      video.style.transform = `scale(${zoom})`;
+      zoomValue.textContent = `${zoom.toFixed(1)}Ã`;
+    };
+
+    function updateTaskDisplay() {
+      taskText.textContent = `Step ${currentTask + 1} of ${tasks.length}: ${tasks[currentTask]}`;
+      prevBtn.disabled = currentTask === 0;
+      nextBtn.disabled = currentTask === tasks.length - 1;
+    }
+
+    prevBtn.onclick = () => {
+      if (currentTask > 0) {
+        currentTask--;
+        updateTaskDisplay();
+      }
+    };
+
+    nextBtn.onclick = () => {
+      if (currentTask < tasks.length - 1) {
+        currentTask++;
+        updateTaskDisplay();
+      }
+    };
+
+  captureStepBtn.onclick = () => {
+    if (capturedImages.length >= 6) {
+      alert("You can only capture up to 6 images.");
+      return;
+    }
+
+    const stepLabel = `Step ${currentTask + 1}: ${tasks[currentTask]}`;
+    const alreadyCaptured = capturedImages.find(img => img.label === stepLabel);
+    if (alreadyCaptured) {
+      alert("You have already captured an image for this step.");
+      return;
+    }
+
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    canvas.getContext("2d").drawImage(video, 0, 0);
+    const imageData = canvas.toDataURL("image/png");
+    const timestamp = new Date().toLocaleString();
+
+    capturedImages.push({
+      data: imageData,
+      label: stepLabel,
+      timestamp: timestamp
+    });
+
+    updatePreviews();
+    status.textContent = `Captured image for step ${currentTask + 1}`;
+    uploadBtn.style.display = "inline-block";
+    downloadBtn.style.display = "inline-block";
+  };
+
+    function updatePreviews() {
+      imagePreviews.innerHTML = "";
+      countSpan.textContent = capturedImages.length;
+      capturedImages.forEach((imgObj, index) => {
+        const wrapper = document.createElement("div");
+        wrapper.classList.add("img-wrapper");
+
+        const img = document.createElement("img");
+        img.src = imgObj.data;
+        img.onclick = () => {
+          zoomedImage.src = imgObj.data;
+          zoomModal.style.display = "flex";
+        };
+
+        const caption = document.createElement("div");
+        caption.style.position = "absolute";
+        caption.style.bottom = "0";
+        caption.style.background = "rgba(0,0,0,0.6)";
+        caption.style.color = "white";
+        caption.style.width = "100%";
+        caption.style.fontSize = "10px";
+        caption.style.padding = "2px 4px";
+        caption.textContent = imgObj.label;
+
+        const delBtn = document.createElement("button");
+        delBtn.textContent = "Ã";
+        delBtn.className = "delete-btn";
+        delBtn.onclick = () => {
+          capturedImages.splice(index, 1);
+          updatePreviews();
+        };
+
+        wrapper.appendChild(img);
+        wrapper.appendChild(caption);
+        wrapper.appendChild(delBtn);
+        imagePreviews.appendChild(wrapper);
+      });
+    }
+
+    zoomModal.onclick = () => {
+      zoomModal.style.display = "none";
+    };
+
+    downloadBtn.onclick = async () => {
+      const { jsPDF } = window.jspdf;
+      const pdf = new jsPDF("l", "pt", "a4");
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+
+      const tech = techNameInput.value || "N/A";
+      const ptName = ptNameInput.value || "Patient";
+      const dob = dobInput.value || "N/A";
+      const notes = notesInput.value || "None";
+      const drugName = "Daptomycin";
+
+      pdf.setFontSize(20);
+      pdf.text("Daptomycin Compounding Summary", 40, 60);
+      pdf.setFontSize(12);
+      pdf.text(`Patient Name: ${ptName}`, 40, 100);
+      pdf.text(`Technician: ${tech}`, 40, 120);
+      pdf.text(`Drug: ${drugName}`, 40, 140);
+      pdf.text(`Date of Birth: ${dob}`, 40, 160);
+      pdf.text("Notes:", 40, 190);
+      const wrappedNotes = pdf.splitTextToSize(notes, pageWidth - 80);
+      pdf.text(wrappedNotes, 40, 210);
+      pdf.setFontSize(9);
+      pdf.setTextColor(150);
+      pdf.text(`Page 1 | Technician: ${tech}`, 40, pageHeight - 20);
+
+      capturedImages.forEach((imgObj, index) => {
+        pdf.addPage("a4", "landscape");
+        pdf.setFontSize(12);
+        pdf.text(imgObj.label, 40, 40);
+        const imgWidth = pageWidth * 0.8;
+        const imgHeight = imgWidth * 0.75;
+        const x = (pageWidth - imgWidth) / 2;
+        pdf.addImage(imgObj.data, 'PNG', x, 60, imgWidth, imgHeight);
+        pdf.setFontSize(9);
+        pdf.setTextColor(150);
+        pdf.text(
+          `Page ${index + 2} | Technician: ${tech} | Captured: ${imgObj.timestamp}`,
+          40,
+          pageHeight - 20
+        );
+      });
+
+      const safePt = ptName.replace(/\s+/g, "_");
+      const safeDate = dob;
+      pdf.save(`${safePt}_Daptomycin_${safeDate}.pdf`);
+    };
+
+    toggleThemeBtn.onclick = () => {
+      document.body.classList.toggle("dark");
+      toggleThemeBtn.textContent = document.body.classList.contains("dark") ? "Light Mode" : "Dark Mode";
+    };
+
+    window.onload = () => {
+      updateTaskDisplay();
+    };
+  </script>
+</body>
+</html>

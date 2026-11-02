@@ -17,7 +17,25 @@ function doGet() {
   const status=x=>document.getElementById('status').textContent=x;
   function refresh(){status('Loading...');google.script.run.withSuccessHandler(rows=>{records=rows;render();status(rows.length+' records');}).withFailureHandler(e=>status(e.message)).listWorkups();}
   function render(){const q=document.getElementById('q').value.toLowerCase();const rows=records.filter(r=>String(r.patientCode||'').toLowerCase().includes(q));document.getElementById('list').innerHTML='<table><thead><tr><th>Room</th><th>Last updated</th><th>View</th></tr></thead><tbody>'+rows.map(r=>'<tr><td>'+esc(r.patientCode)+'</td><td>'+esc(r.updatedAt)+'</td><td><button data-id="'+esc(r.recordId)+'" onclick="openRecord(this.dataset.id)">View</button></td></tr>').join('')+'</tbody></table>';}
-  function openRecord(id){status('Loading room...');google.script.run.withSuccessHandler(data=>{selected=data;document.getElementById('details').innerHTML='<h2>Room '+esc(data.patientCode)+'</h2><button onclick="printWorksheet()">Download PDF / Print Worksheet</button><table>'+Object.entries(data).filter(([k,v])=>v!==''&&v!=null).map(([k,v])=>'<tr><th>'+esc(k)+'</th><td>'+esc(v)+'</td></tr>').join('')+'</table>';status('Record loaded');}).withFailureHandler(e=>status(e.message)).getWorkup(id);}
+  function showRecord(){
+    if(!selected)return;
+    document.getElementById('details').innerHTML='<h2>Room '+esc(selected.patientCode)+'</h2><button onclick="editRecord()">Edit / Complete Missing Information</button><button onclick="printWorksheet()">Download PDF / Print Worksheet</button><table>'+Object.entries(selected).filter(([k,v])=>v!==''&&v!=null).map(([k,v])=>'<tr><th>'+esc(k)+'</th><td>'+esc(v)+'</td></tr>').join('')+'</table>';
+  }
+  function openRecord(id){status('Loading room...');google.script.run.withSuccessHandler(data=>{selected=data;showRecord();status('Record loaded');}).withFailureHandler(e=>status(e.message)).getWorkup(id);}
+  function editRecord(){
+    if(!selected)return;
+    const editable=Object.entries(selected).filter(([k])=>k!=='recordId'&&k!=='updatedAt');
+    document.getElementById('details').innerHTML='<h2>Edit Room '+esc(selected.patientCode)+'</h2><p>Update missing or incorrect information, then save to the same Google Sheet record.</p><button onclick="saveEditedRecord()">Save Changes</button><button onclick="showRecord()">Cancel</button><table>'+editable.map(([k,v])=>'<tr><th><label for="edit_'+esc(k)+'">'+esc(k)+'</label></th><td><textarea id="edit_'+esc(k)+'" data-key="'+esc(k)+'" rows="2" style="width:100%;min-height:50px;padding:7px;border:1px solid #aaa">'+esc(v)+'</textarea></td></tr>').join('')+'</table><button onclick="saveEditedRecord()">Save Changes</button>';
+  }
+  function saveEditedRecord(){
+    if(!selected)return;
+    const updated={...selected};
+    document.querySelectorAll('#details textarea[data-key]').forEach(el=>updated[el.dataset.key]=el.value);
+    status('Saving changes...');
+    google.script.run.withSuccessHandler(result=>{
+      google.script.run.withSuccessHandler(data=>{selected=data;showRecord();refresh();status('Changes saved to Google Sheets.');}).withFailureHandler(e=>status('Saved, but refresh failed: '+e.message)).getWorkup(result.recordId);
+    }).withFailureHandler(e=>status('Update failed: '+e.message)).saveWorkup(updated);
+  }
   function printWorksheet(){
     if(!selected){status('Select a room first.');return;}
     const d=selected;

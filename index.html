@@ -1,202 +1,116 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8" />
-<title>OZZY Garage Control + Cameras</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ICU Patient Workup</title><style>
+:root{font-family:Arial,Helvetica,sans-serif;color:#20252b;background:#e9ebed;font-size:14px}
+*{box-sizing:border-box}body{margin:0}.wrap{max-width:1080px;margin:0 auto;padding:22px 24px 34px;background:#fff;min-height:100vh;border-left:1px solid #cfd3d7;border-right:1px solid #cfd3d7}
+header{background:#fff;color:#172b3b;padding:8px 0 17px;border-bottom:3px solid #263f52;margin-bottom:18px}header h1{margin:0 0 5px;font-size:25px;font-family:Georgia,'Times New Roman',serif;font-weight:700;letter-spacing:.1px}header p{margin:0;color:#5b6570;font-size:12px;letter-spacing:.15px}
+.notice{background:#f7f7f4;border:1px solid #d8d7d0;border-left:3px solid #8a7955;padding:10px 12px;margin:0 0 18px;font-size:12px;line-height:1.5;color:#42474b}
+.toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:20px;padding:0 0 16px;border-bottom:1px solid #d8dcdf}button{background:#263f52;color:#fff;border:1px solid #263f52;border-radius:2px;padding:9px 13px;font-family:Arial,Helvetica,sans-serif;font-size:12px;font-weight:600;cursor:pointer}button:hover{background:#172b3b}button.secondary{background:#fff;color:#263f52;border-color:#aab3ba}button.secondary:hover{background:#f1f3f4}button:disabled{opacity:.6}
+select,input,textarea{width:100%;border:1px solid #aeb6bc;border-radius:2px;background:#fff;padding:8px 9px;font:inherit;min-width:0;color:#222}select:focus,input:focus,textarea:focus{outline:2px solid #718b9e;outline-offset:0;border-color:#263f52}textarea{min-height:70px;resize:vertical}
+.section{background:#fff;border:1px solid #cbd1d6;border-radius:0;margin:0 0 17px;overflow:hidden}.section h2{background:#f0f1f2;border-bottom:1px solid #cbd1d6;color:#263f52;margin:0;padding:11px 15px;font-size:14px;font-weight:700;letter-spacing:.15px}.fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px 22px;padding:16px}.field label{display:block;font-weight:700;font-size:12px;margin-bottom:4px;color:#222d36}.help{color:#626970;font-size:11px;margin:0 0 7px;line-height:1.45}.normal{color:#40566a;font-weight:600}.full{grid-column:1/-1}
+.result{padding:12px 14px;border-radius:0;background:#f5f6f6;border-top:1px solid #cbd1d6;margin:0 16px 16px;color:#263f52}.result strong{display:block;margin-bottom:6px;font-size:12px;text-transform:uppercase;letter-spacing:.4px}.small{font-size:11px;color:#626970;line-height:1.5}.status{font-size:12px;color:#40566a;align-self:center}footer{padding:12px 0;color:#6b737a;font-size:11px;line-height:1.5;border-top:1px solid #d8dcdf}
+@media(max-width:650px){.wrap{padding:13px 12px}.fields{grid-template-columns:1fr;padding:12px;gap:13px}.toolbar{gap:7px}header h1{font-size:22px}.section h2{padding:10px 12px}button{padding:9px 10px}}
+.check-options{display:flex;flex-wrap:wrap;gap:8px 14px;padding:8px 0}.check-choice{display:inline-flex!important;align-items:center;gap:6px;font-size:13px!important;font-weight:400!important;cursor:pointer}.check-choice input{width:17px;height:17px;accent-color:#263f52;margin:0}.check-other{margin-top:5px}.check-choice span{white-space:nowrap}
 
-<style>
-:root {
-  --primary: #007acc;
-  --accent: #d9eaff;
-  --bg: #fdfefe;
-  --glass: rgba(255,255,255,0.2);
-  --border-glass: rgba(255,255,255,0.4);
-  --text: #333;
+.med-editor{margin-top:5px}.med-entry{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr) auto;gap:6px;align-items:start}.med-search-wrap{position:relative;min-width:0}.med-search,.med-dose{height:37px}.med-add{height:37px;white-space:nowrap;padding:7px 11px}.med-hint{font-size:11px;color:#68727a;margin-top:5px}.med-suggestions{position:absolute;z-index:20;top:100%;left:0;right:0;max-height:190px;overflow:auto;background:#fff;border:1px solid #aeb6bc;box-shadow:0 3px 7px #0002}.med-suggestions button{display:block;width:100%;text-align:left;color:#222;background:white;border:0;border-bottom:1px solid #e7e7e7;border-radius:0;padding:9px}.med-suggestions button:hover,.med-suggestions button:focus{background:#e9eff3}.med-item{display:flex;justify-content:space-between;align-items:center;gap:8px;border-bottom:1px solid #e0e3e5;padding:7px 0;font-size:12px}.med-item button{color:#7a2525;background:#fff;border:1px solid #bbb;padding:4px 7px}.med-items:empty{display:none}@media(max-width:650px){.med-entry{grid-template-columns:1fr 1fr}.med-search-wrap{grid-column:1 / -1}.med-add{grid-column:2}.med-dose{grid-column:1}}
+</style></head><body><div class="wrap"><header><h1>ICU Patient Workup</h1><p>Clinical assessment worksheet | Reference ranges | Patient records</p></header><div class="toolbar"><button type="button" onclick="save()">Save / Update</button><button class="secondary" type="button" onclick="newRecord()">New Workup</button><button class="secondary" type="button" onclick="loadList()">Refresh Saved Records</button><select id="saved" aria-label="Saved records" style="max-width:350px"><option value="">Select saved workup...</option></select><button class="secondary" type="button" onclick="loadSelected()">Load</button><span class="status" id="status"></span></div><form id="workup" onsubmit="event.preventDefault();save()"><section class="section"><h2>Patient Information</h2><div class="fields"><div class="field"><label for="patientCode">Room Number</label><p class="help">Room number for the workup. <span class="normal">Normal/target: Use only in an institution-approved deployment.</span></p><input id="patientCode" name="patientCode" type="text"></div><div class="field full"><label for="cc">CC</label><p class="help">Chief complaint.</p><textarea id="cc" name="cc"></textarea></div><div class="field full"><label for="hpi">HPI</label><p class="help">History of present illness.</p><textarea id="hpi" name="hpi"></textarea></div><div class="field full"><label for="pmh">PMH</label><p class="help">Past medical history.</p><textarea id="pmh" name="pmh"></textarea></div><div class="field full"><label for="whyIcu">Why ICU?</label><p class="help">Reason for intensive care admission.</p><textarea id="whyIcu" name="whyIcu"></textarea></div></div></section><section class="section"><h2>Neuro — Neurological</h2><div class="fields"><div class="field"><label for="cpot">CPOT</label><p class="help">Critical-Care Pain Observation Tool. <span class="normal">Normal/target: Score 0–8; target &lt;3</span></p><input id="cpot" name="cpot" type="text"></div><div class="field"><label for="rass">RASS</label><p class="help">Richmond Agitation-Sedation Scale. <span class="normal">Normal/target: 0 = alert/calm; common target −1 to +1</span></p><input id="rass" name="rass" type="text"></div><div class="field"><label for="camIcu">CAM-ICU</label><p class="help">Confusion Assessment Method for ICU. <span class="normal">Normal/target: Negative = delirium not detected</span></p><input id="camIcu" name="camIcu" type="hidden"><div class="check-options" data-field="camIcu"><label class="check-choice"><input type="checkbox" value="Negative" onchange="chooseOption(this)"><span>Negative</span></label><label class="check-choice"><input type="checkbox" value="Positive" onchange="chooseOption(this)"><span>Positive</span></label><label class="check-choice"><input type="checkbox" value="Unable to assess" onchange="chooseOption(this)"><span>Unable to assess</span></label></div></div><div class="field"><label for="sedationMeds">Sedation Meds</label><p class="help">Sedation medications and doses. <span class="normal">Normal/target: Individualized</span></p><input id="sedationMeds" name="sedationMeds" type="hidden"><div class="med-editor" data-med="sedationMeds"><div class="med-entry"><div class="med-search-wrap"><input class="med-search" type="text" autocomplete="off" placeholder="Search medication (3+ letters)" aria-label="Search medication" oninput="suggestMeds(this)" onkeydown="medKeydown(event,this)"><div class="med-suggestions" role="listbox" hidden></div></div><input class="med-dose" type="text" placeholder="Dose / route / frequency" aria-label="Dose, route and frequency"><button type="button" class="med-add" onclick="addMed(this)">Add</button></div><div class="med-hint">Search live NLM RxTerms after 3 letters. Enter the patient dose separately.</div><div class="med-items" aria-live="polite"></div></div></div><div class="field"><label for="seizureMeds">Anti-seizure Meds</label><p class="help">Medications for seizures. <span class="normal">Normal/target: Individualized</span></p><input id="seizureMeds" name="seizureMeds" type="hidden"><div class="med-editor" data-med="seizureMeds"><div class="med-entry"><div class="med-search-wrap"><input class="med-search" type="text" autocomplete="off" placeholder="Search medication (3+ letters)" aria-label="Search medication" oninput="suggestMeds(this)" onkeydown="medKeydown(event,this)"><div class="med-suggestions" role="listbox" hidden></div></div><input class="med-dose" type="text" placeholder="Dose / route / frequency" aria-label="Dose, route and frequency"><button type="button" class="med-add" onclick="addMed(this)">Add</button></div><div class="med-hint">Search live NLM RxTerms after 3 letters. Enter the patient dose separately.</div><div class="med-items" aria-live="polite"></div></div></div><div class="field"><label for="painMeds">Pain Meds</label><p class="help">Analgesic medications and doses. <span class="normal">Normal/target: Individualized</span></p><input id="painMeds" name="painMeds" type="hidden"><div class="med-editor" data-med="painMeds"><div class="med-entry"><div class="med-search-wrap"><input class="med-search" type="text" autocomplete="off" placeholder="Search medication (3+ letters)" aria-label="Search medication" oninput="suggestMeds(this)" onkeydown="medKeydown(event,this)"><div class="med-suggestions" role="listbox" hidden></div></div><input class="med-dose" type="text" placeholder="Dose / route / frequency" aria-label="Dose, route and frequency"><button type="button" class="med-add" onclick="addMed(this)">Add</button></div><div class="med-hint">Search live NLM RxTerms after 3 letters. Enter the patient dose separately.</div><div class="med-items" aria-live="polite"></div></div></div></div></section><section class="section"><h2>Resp — Respiratory</h2><div class="fields"><div class="field"><label for="respSupport">RA / NC / Vent</label><p class="help">Room air, nasal cannula or ventilator. <span class="normal">Normal/target: RA = 21% oxygen</span></p><input id="respSupport" name="respSupport" type="hidden"><div class="check-options" data-field="respSupport"><label class="check-choice"><input type="checkbox" value="Room air" onchange="chooseOption(this)"><span>Room air</span></label><label class="check-choice"><input type="checkbox" value="Nasal cannula" onchange="chooseOption(this)"><span>Nasal cannula</span></label><label class="check-choice"><input type="checkbox" value="Ventilator" onchange="chooseOption(this)"><span>Ventilator</span></label></div><input class="check-other" type="text" data-other="respSupport" placeholder="Other / details (optional)" oninput="syncChecks('respSupport')"></div><div class="field"><label for="fio2">FiO₂ (%)</label><p class="help">Fraction of inspired oxygen. <span class="normal">Normal/target: 21% on room air</span></p><input id="fio2" name="fio2" type="text"></div><div class="field"><label for="peep">PEEP (cmH₂O)</label><p class="help">Positive end-expiratory pressure. <span class="normal">Normal/target: Common initial ventilator setting: 5</span></p><input id="peep" name="peep" type="text"></div><div class="field"><label for="ph">ABG pH</label><p class="help">Arterial blood acidity/alkalinity. <span class="normal">Normal/target: 7.35–7.45</span></p><input id="ph" name="ph" type="text"></div><div class="field"><label for="paco2">PaCO₂ (mmHg)</label><p class="help">Arterial carbon dioxide partial pressure. <span class="normal">Normal/target: 35–45</span></p><input id="paco2" name="paco2" type="text"></div><div class="field"><label for="pao2">PaO₂ (mmHg)</label><p class="help">Arterial oxygen partial pressure. <span class="normal">Normal/target: 80–100 on room air</span></p><input id="pao2" name="pao2" type="text"></div><div class="field"><label for="hco3">HCO₃ (mEq/L)</label><p class="help">Bicarbonate. <span class="normal">Normal/target: 22–26</span></p><input id="hco3" name="hco3" type="text"></div><div class="field"><label for="respMeds">Respiratory Meds</label><p class="help">Respiratory medications and doses. <span class="normal">Normal/target: Individualized</span></p><input id="respMeds" name="respMeds" type="hidden"><div class="med-editor" data-med="respMeds"><div class="med-entry"><div class="med-search-wrap"><input class="med-search" type="text" autocomplete="off" placeholder="Search medication (3+ letters)" aria-label="Search medication" oninput="suggestMeds(this)" onkeydown="medKeydown(event,this)"><div class="med-suggestions" role="listbox" hidden></div></div><input class="med-dose" type="text" placeholder="Dose / route / frequency" aria-label="Dose, route and frequency"><button type="button" class="med-add" onclick="addMed(this)">Add</button></div><div class="med-hint">Search live NLM RxTerms after 3 letters. Enter the patient dose separately.</div><div class="med-items" aria-live="polite"></div></div></div></div><div class="result"><strong>Automatic ABG interpretation</strong><span id="abgResult">Enter pH, PaCO₂ and HCO₃.</span><p class="small" id="abgNote"></p></div></section><section class="section"><h2>Cards — Cardiovascular</h2><div class="fields"><div class="field"><label for="sbp">SBP (mmHg)</label><p class="help">Systolic blood pressure. <span class="normal">Normal/target: Typical adult reference ~90–119</span></p><input id="sbp" name="sbp" type="text"></div><div class="field"><label for="map">MAP (mmHg)</label><p class="help">Mean arterial pressure. <span class="normal">Normal/target: Common initial septic shock target ≥65</span></p><input id="map" name="map" type="text"></div><div class="field"><label for="mapTrends">MAP Trends</label><p class="help">Changes in MAP over time. <span class="normal">Normal/target: Individualized</span></p><input id="mapTrends" name="mapTrends" type="text"></div><div class="field"><label for="hr">HR (bpm)</label><p class="help">Heart rate. <span class="normal">Normal/target: 60–100</span></p><input id="hr" name="hr" type="text"></div><div class="field"><label for="echo">Echo</label><p class="help">Echocardiogram findings. <span class="normal">Normal/target: N/A</span></p><input id="echo" name="echo" type="text"></div><div class="field"><label for="ef">EF (%)</label><p class="help">Left ventricular ejection fraction. <span class="normal">Normal/target: ~55–70%</span></p><input id="ef" name="ef" type="text"></div><div class="field"><label for="bpMeds">BP Meds</label><p class="help">Blood pressure medications and doses. <span class="normal">Normal/target: Individualized</span></p><input id="bpMeds" name="bpMeds" type="hidden"><div class="med-editor" data-med="bpMeds"><div class="med-entry"><div class="med-search-wrap"><input class="med-search" type="text" autocomplete="off" placeholder="Search medication (3+ letters)" aria-label="Search medication" oninput="suggestMeds(this)" onkeydown="medKeydown(event,this)"><div class="med-suggestions" role="listbox" hidden></div></div><input class="med-dose" type="text" placeholder="Dose / route / frequency" aria-label="Dose, route and frequency"><button type="button" class="med-add" onclick="addMed(this)">Add</button></div><div class="med-hint">Search live NLM RxTerms after 3 letters. Enter the patient dose separately.</div><div class="med-items" aria-live="polite"></div></div></div><div class="field"><label for="pressors">Pressors</label><p class="help">Vasopressors and doses. <span class="normal">Normal/target: Titrate to ordered goal</span></p><input id="pressors" name="pressors" type="hidden"><div class="med-editor" data-med="pressors"><div class="med-entry"><div class="med-search-wrap"><input class="med-search" type="text" autocomplete="off" placeholder="Search medication (3+ letters)" aria-label="Search medication" oninput="suggestMeds(this)" onkeydown="medKeydown(event,this)"><div class="med-suggestions" role="listbox" hidden></div></div><input class="med-dose" type="text" placeholder="Dose / route / frequency" aria-label="Dose, route and frequency"><button type="button" class="med-add" onclick="addMed(this)">Add</button></div><div class="med-hint">Search live NLM RxTerms after 3 letters. Enter the patient dose separately.</div><div class="med-items" aria-live="polite"></div></div></div></div></section><section class="section"><h2>Heme / Renal</h2><div class="fields"><div class="field"><label for="bg">BG (mg/dL)</label><p class="help">Blood glucose. <span class="normal">Normal/target: Fasting 70–99; common ICU treatment target 140–180</span></p><input id="bg" name="bg" type="text"></div><div class="field"><label for="insulin">Insulin</label><p class="help">Insulin treatment and doses. <span class="normal">Normal/target: Individualized</span></p><input id="insulin" name="insulin" type="hidden"><div class="med-editor" data-med="insulin"><div class="med-entry"><div class="med-search-wrap"><input class="med-search" type="text" autocomplete="off" placeholder="Search medication (3+ letters)" aria-label="Search medication" oninput="suggestMeds(this)" onkeydown="medKeydown(event,this)"><div class="med-suggestions" role="listbox" hidden></div></div><input class="med-dose" type="text" placeholder="Dose / route / frequency" aria-label="Dose, route and frequency"><button type="button" class="med-add" onclick="addMed(this)">Add</button></div><div class="med-hint">Search live NLM RxTerms after 3 letters. Enter the patient dose separately.</div><div class="med-items" aria-live="polite"></div></div></div><div class="field"><label for="hgb">Hgb (g/dL)</label><p class="help">Hemoglobin. <span class="normal">Normal/target: Male ~13.5–17.5; female ~12–16</span></p><input id="hgb" name="hgb" type="text"></div><div class="field"><label for="hct">Hct (%)</label><p class="help">Hematocrit. <span class="normal">Normal/target: Male ~41–53%; female ~36–46%</span></p><input id="hct" name="hct" type="text"></div><div class="field"><label for="platelets">Plt (×10³/µL)</label><p class="help">Platelet count. <span class="normal">Normal/target: 150–450</span></p><input id="platelets" name="platelets" type="text"></div><div class="field"><label for="scr">SCr (mg/dL)</label><p class="help">Serum creatinine. <span class="normal">Normal/target: ~0.6–1.3</span></p><input id="scr" name="scr" type="text"></div><div class="field"><label for="crcl">CrCl (mL/min)</label><p class="help">Creatinine clearance — estimated kidney filtration for medication dosing. <span class="normal">Reference: approximately 90–120 mL/min in healthy younger adults; varies with age and body size.</span></p><input id="crcl" name="crcl" type="number" min="0" step="any" inputmode="decimal" placeholder="Enter CrCl"></div><div class="field"><label for="rrt">RRT</label><p class="help">Renal replacement therapy. <span class="normal">Normal/target: Not ordinarily required</span></p><input id="rrt" name="rrt" type="hidden"><div class="check-options" data-field="rrt"><label class="check-choice"><input type="checkbox" value="Yes" onchange="chooseOption(this)"><span>Yes</span></label><label class="check-choice"><input type="checkbox" value="No" onchange="chooseOption(this)"><span>No</span></label></div></div><div class="field"><label for="hd">HD</label><p class="help">Hemodialysis. <span class="normal">Normal/target: Not ordinarily required</span></p><input id="hd" name="hd" type="hidden"><div class="check-options" data-field="hd"><label class="check-choice"><input type="checkbox" value="Yes" onchange="chooseOption(this)"><span>Yes</span></label><label class="check-choice"><input type="checkbox" value="No" onchange="chooseOption(this)"><span>No</span></label></div></div><div class="field"><label for="hdReceived">HD Received</label><p class="help">Whether the patient received hemodialysis.</p><input id="hdReceived" name="hdReceived" type="hidden"><div class="check-options" data-field="hdReceived"><label class="check-choice"><input type="checkbox" value="Yes" onchange="chooseOption(this)"><span>Yes</span></label><label class="check-choice"><input type="checkbox" value="No" onchange="chooseOption(this)"><span>No</span></label></div></div><div class="field"><label for="hdSchedule">HD Schedule</label><p class="help">Scheduled hemodialysis days.</p><input id="hdSchedule" name="hdSchedule" type="hidden"><div class="check-options" data-field="hdSchedule"><label class="check-choice"><input type="checkbox" value="Mon" onchange="chooseOption(this)"><span>Mon</span></label><label class="check-choice"><input type="checkbox" value="Tue" onchange="chooseOption(this)"><span>Tue</span></label><label class="check-choice"><input type="checkbox" value="Wed" onchange="chooseOption(this)"><span>Wed</span></label><label class="check-choice"><input type="checkbox" value="Thu" onchange="chooseOption(this)"><span>Thu</span></label><label class="check-choice"><input type="checkbox" value="Fri" onchange="chooseOption(this)"><span>Fri</span></label><label class="check-choice"><input type="checkbox" value="Sat" onchange="chooseOption(this)"><span>Sat</span></label><label class="check-choice"><input type="checkbox" value="Sun" onchange="chooseOption(this)"><span>Sun</span></label></div><input class="check-other" type="text" data-other="hdSchedule" placeholder="Other schedule / details (optional)" oninput="syncChecks('hdSchedule')"></div><div class="field"><label for="crrt">CRRT</label><p class="help">Continuous renal replacement therapy. <span class="normal">Normal/target: Not ordinarily required</span></p><input id="crrt" name="crrt" type="hidden"><div class="check-options" data-field="crrt"><label class="check-choice"><input type="checkbox" value="Yes" onchange="chooseOption(this)"><span>Yes</span></label><label class="check-choice"><input type="checkbox" value="No" onchange="chooseOption(this)"><span>No</span></label></div></div><div class="field"><label for="fluid24">Fluid Balance — 24h (mL)</label><p class="help">Intake minus output over 24 hours. <span class="normal">Normal/target: Individualized</span></p><input id="fluid24" name="fluid24" type="text"></div><div class="field"><label for="fluidTotal">Fluid Balance — Total (mL)</label><p class="help">Cumulative intake minus output. <span class="normal">Normal/target: Individualized</span></p><input id="fluidTotal" name="fluidTotal" type="text"></div><div class="field"><label for="acMeds">AC Meds</label><p class="help">Anticoagulant medications and doses. <span class="normal">Normal/target: Based on indication</span></p><input id="acMeds" name="acMeds" type="hidden"><div class="med-editor" data-med="acMeds"><div class="med-entry"><div class="med-search-wrap"><input class="med-search" type="text" autocomplete="off" placeholder="Search medication (3+ letters)" aria-label="Search medication" oninput="suggestMeds(this)" onkeydown="medKeydown(event,this)"><div class="med-suggestions" role="listbox" hidden></div></div><input class="med-dose" type="text" placeholder="Dose / route / frequency" aria-label="Dose, route and frequency"><button type="button" class="med-add" onclick="addMed(this)">Add</button></div><div class="med-hint">Search live NLM RxTerms after 3 letters. Enter the patient dose separately.</div><div class="med-items" aria-live="polite"></div></div></div><div class="field"><label for="diuretics">Diuretics</label><p class="help">Diuretic medications and doses. <span class="normal">Normal/target: Based on fluid status</span></p><input id="diuretics" name="diuretics" type="hidden"><div class="med-editor" data-med="diuretics"><div class="med-entry"><div class="med-search-wrap"><input class="med-search" type="text" autocomplete="off" placeholder="Search medication (3+ letters)" aria-label="Search medication" oninput="suggestMeds(this)" onkeydown="medKeydown(event,this)"><div class="med-suggestions" role="listbox" hidden></div></div><input class="med-dose" type="text" placeholder="Dose / route / frequency" aria-label="Dose, route and frequency"><button type="button" class="med-add" onclick="addMed(this)">Add</button></div><div class="med-hint">Search live NLM RxTerms after 3 letters. Enter the patient dose separately.</div><div class="med-items" aria-live="polite"></div></div></div></div></section><section class="section"><h2>PPx — Prophylaxis</h2><div class="fields"><div class="field"><label for="dvt">DVT PPx</label><p class="help">Deep vein thrombosis prophylaxis. <span class="normal">Normal/target: If indicated</span></p><input id="dvt" name="dvt" type="hidden"><div class="check-options" data-field="dvt"><label class="check-choice"><input type="checkbox" value="Heparin" onchange="chooseOption(this)"><span>Heparin</span></label><label class="check-choice"><input type="checkbox" value="Enoxaparin" onchange="chooseOption(this)"><span>Enoxaparin</span></label><label class="check-choice"><input type="checkbox" value="Mechanical" onchange="chooseOption(this)"><span>Mechanical</span></label><label class="check-choice"><input type="checkbox" value="None" onchange="chooseOption(this)"><span>None</span></label></div><input class="check-other" type="text" data-other="dvt" placeholder="Other / details (optional)" oninput="syncChecks('dvt')"></div><div class="field"><label for="sup">SUP</label><p class="help">Stress ulcer prophylaxis. <span class="normal">Normal/target: If indicated</span></p><input id="sup" name="sup" type="hidden"><div class="check-options" data-field="sup"><label class="check-choice"><input type="checkbox" value="PPI" onchange="chooseOption(this)"><span>PPI</span></label><label class="check-choice"><input type="checkbox" value="H2 blocker" onchange="chooseOption(this)"><span>H2 blocker</span></label><label class="check-choice"><input type="checkbox" value="None" onchange="chooseOption(this)"><span>None</span></label></div><input class="check-other" type="text" data-other="sup" placeholder="Other / details (optional)" oninput="syncChecks('sup')"></div></div></section><section class="section"><h2>ID — Infectious Diseases</h2><div class="fields"><div class="field"><label for="wbc">WBC (×10³/µL)</label><p class="help">White blood cell count. <span class="normal">Normal/target: 4–11</span></p><input id="wbc" name="wbc" type="text"></div><div class="field"><label for="mrsa">MRSA PCR</label><p class="help">Methicillin-resistant Staphylococcus aureus PCR. <span class="normal">Normal/target: Negative</span></p><input id="mrsa" name="mrsa" type="hidden"><div class="check-options" data-field="mrsa"><label class="check-choice"><input type="checkbox" value="Positive" onchange="chooseOption(this)"><span>Positive</span></label><label class="check-choice"><input type="checkbox" value="Negative" onchange="chooseOption(this)"><span>Negative</span></label><label class="check-choice"><input type="checkbox" value="Pending" onchange="chooseOption(this)"><span>Pending</span></label></div></div><div class="field"><label for="fever">Febrile / Afebrile</label><p class="help">Fever status. <span class="normal">Normal/target: Afebrile; typical temperature ~36.1–37.2°C</span></p><input id="fever" name="fever" type="hidden"><div class="check-options" data-field="fever"><label class="check-choice"><input type="checkbox" value="Febrile" onchange="chooseOption(this)"><span>Febrile</span></label><label class="check-choice"><input type="checkbox" value="Afebrile" onchange="chooseOption(this)"><span>Afebrile</span></label></div></div><div class="field"><label for="cultures">Cultures</label><p class="help">Microbiology culture results. <span class="normal">Normal/target: No growth if no infection</span></p><input id="cultures" name="cultures" type="text"></div><div class="field"><label for="antibiotics">Abx</label><p class="help">Antibiotics, doses, routes and frequencies. <span class="normal">Normal/target: Based on infection</span></p><input id="antibiotics" name="antibiotics" type="hidden"><div class="med-editor" data-med="antibiotics"><div class="med-entry"><div class="med-search-wrap"><input class="med-search" type="text" autocomplete="off" placeholder="Search medication (3+ letters)" aria-label="Search medication" oninput="suggestMeds(this)" onkeydown="medKeydown(event,this)"><div class="med-suggestions" role="listbox" hidden></div></div><input class="med-dose" type="text" placeholder="Dose / route / frequency" aria-label="Dose, route and frequency"><button type="button" class="med-add" onclick="addMed(this)">Add</button></div><div class="med-hint">Search live NLM RxTerms after 3 letters. Enter the patient dose separately.</div><div class="med-items" aria-live="polite"></div></div></div><div class="field"><label for="therapyDay">Day of Therapy</label><p class="help">Current antibiotic treatment day. <span class="normal">Normal/target: Based on prescribed course</span></p><input id="therapyDay" name="therapyDay" type="text"></div><div class="field"><label for="endDate">End Date</label><p class="help">Planned antibiotic end date.</p><input id="endDate" name="endDate" type="date"></div></div></section></form><footer>Reference intervals are approximate adult values and may differ by laboratory or patient. Treatment targets must be individualized. The ABG screen is not a substitute for full compensation and mixed-disorder analysis.</footer></div><script>
+const sections=[
+['Patient Information',[
+['patientCode','Room Number','Room number for the workup.','Use only in an institution-approved deployment.','text'],['cc','CC','Chief complaint.','','textarea'],['hpi','HPI','History of present illness.','','textarea'],['pmh','PMH','Past medical history.','','textarea'],['whyIcu','Why ICU?','Reason for intensive care admission.','','textarea']]],
+['Neuro — Neurological',[
+['cpot','CPOT','Critical-Care Pain Observation Tool.','Score 0–8; target <3'],['rass','RASS','Richmond Agitation-Sedation Scale.','0 = alert/calm; common target −1 to +1'],['camIcu','CAM-ICU','Confusion Assessment Method for ICU.','Negative = delirium not detected'],['sedationMeds','Sedation Meds','Sedation medications and doses.','Individualized'],['seizureMeds','Anti-seizure Meds','Medications for seizures.','Individualized'],['painMeds','Pain Meds','Analgesic medications and doses.','Individualized']]],
+['Resp — Respiratory',[
+['respSupport','RA / NC / Vent','Room air, nasal cannula or ventilator.','RA = 21% oxygen'],['fio2','FiO₂ (%)','Fraction of inspired oxygen.','21% on room air'],['peep','PEEP (cmH₂O)','Positive end-expiratory pressure.','Common initial ventilator setting: 5'],['ph','ABG pH','Arterial blood acidity/alkalinity.','7.35–7.45'],['paco2','PaCO₂ (mmHg)','Arterial carbon dioxide partial pressure.','35–45'],['pao2','PaO₂ (mmHg)','Arterial oxygen partial pressure.','80–100 on room air'],['hco3','HCO₃ (mEq/L)','Bicarbonate.','22–26'],['respMeds','Respiratory Meds','Respiratory medications and doses.','Individualized']]],
+['Cards — Cardiovascular',[
+['sbp','SBP (mmHg)','Systolic blood pressure.','Typical adult reference ~90–119'],['map','MAP (mmHg)','Mean arterial pressure.','Common initial septic shock target ≥65'],['mapTrends','MAP Trends','Changes in MAP over time.','Individualized'],['hr','HR (bpm)','Heart rate.','60–100'],['echo','Echo','Echocardiogram findings.','N/A'],['ef','EF (%)','Left ventricular ejection fraction.','~55–70%'],['bpMeds','BP Meds','Blood pressure medications and doses.','Individualized'],['pressors','Pressors','Vasopressors and doses.','Titrate to ordered goal']]],
+['Heme / Renal',[
+['bg','BG (mg/dL)','Blood glucose.','Fasting 70–99; common ICU treatment target 140–180'],['insulin','Insulin','Insulin treatment and doses.','Individualized'],['hgb','Hgb (g/dL)','Hemoglobin.','Male ~13.5–17.5; female ~12–16'],['hct','Hct (%)','Hematocrit.','Male ~41–53%; female ~36–46%'],['platelets','Plt (×10³/µL)','Platelet count.','150–450'],['scr','SCr (mg/dL)','Serum creatinine.','~0.6–1.3'],['crcl','CrCl (mL/min)','Creatinine clearance for renal medication dosing.','~90–120 in healthy younger adults; individualized'],['rrt','RRT','Renal replacement therapy.','Not ordinarily required'],['hd','HD','Hemodialysis.','Not ordinarily required'],['hdReceived','HD Received','Whether hemodialysis was received.','Yes / No'],['hdSchedule','HD Schedule','Scheduled hemodialysis days.','Individualized'],['crrt','CRRT','Continuous renal replacement therapy.','Not ordinarily required'],['fluid24','Fluid Balance — 24h (mL)','Intake minus output over 24 hours.','Individualized'],['fluidTotal','Fluid Balance — Total (mL)','Cumulative intake minus output.','Individualized'],['acMeds','AC Meds','Anticoagulant medications and doses.','Based on indication'],['diuretics','Diuretics','Diuretic medications and doses.','Based on fluid status']]],
+['PPx — Prophylaxis',[
+['dvt','DVT PPx','Deep vein thrombosis prophylaxis.','If indicated'],['sup','SUP','Stress ulcer prophylaxis.','If indicated']]],
+['ID — Infectious Diseases',[
+['wbc','WBC (×10³/µL)','White blood cell count.','4–11'],['mrsa','MRSA PCR','Methicillin-resistant Staphylococcus aureus PCR.','Negative'],['fever','Febrile / Afebrile','Fever status.','Afebrile; typical temperature ~36.1–37.2°C'],['cultures','Cultures','Microbiology culture results.','No growth if no infection'],['antibiotics','Abx','Antibiotics, doses, routes and frequencies.','Based on infection'],['therapyDay','Day of Therapy','Current antibiotic treatment day.','Based on prescribed course'],['endDate','End Date','Planned antibiotic end date.','','date']]]
+];
+let currentId='';const form=document.getElementById('workup');
+['ph','paco2','hco3'].forEach(k=>document.getElementById(k).addEventListener('input',interpretABG));
+function value(k){return document.getElementById(k).value.trim();}
+function interpretABG(){const raw=['ph','paco2','hco3'].map(value);const out=document.getElementById('abgResult'),note=document.getElementById('abgNote');if(raw.some(v=>!v)){out.textContent='Enter pH, PaCO₂ and HCO₃.';note.textContent='';return out.textContent;}const [p,c,h]=raw.map(Number);if(raw.some(v=>!Number.isFinite(Number(v)))||p<6.5||p>8||c<=0||h<=0){out.textContent='Check ABG values.';note.textContent='';return out.textContent;}
+const acid=p<7.35,alk=p>7.45,ma=h<22,ml=h>26,ra=c>45,rl=c<35;let result;
+if(acid){result=ma&&ra?'Possible mixed metabolic + respiratory acidosis':ma?'Metabolic acidosis pattern':ra?'Respiratory acidosis pattern':'Acidemia — further evaluation needed';}
+else if(alk){result=ml&&rl?'Possible mixed metabolic + respiratory alkalosis':ml?'Metabolic alkalosis pattern':rl?'Respiratory alkalosis pattern':'Alkalemia — further evaluation needed';}
+else result='Normal-range pH — compensated or mixed disorder possible';
+let expected='';if(ma){const low=1.5*h+8-2,high=1.5*h+8+2;expected=`Winter’s formula: expected PaCO₂ ${low.toFixed(1)}–${high.toFixed(1)} mmHg. `+(c>high?'Measured PaCO₂ is higher: possible additional respiratory acidosis.':c<low?'Measured PaCO₂ is lower: possible additional respiratory alkalosis.':'Measured PaCO₂ is within the expected range.');if(acid)result='Metabolic acidosis'+(c>high?' + possible respiratory acidosis':c<low?' + possible respiratory alkalosis':' (appropriate respiratory compensation possible)');}
+out.textContent=result;note.textContent=(expected?expected+' ':'')+'Screening only: additional compensation rules, anion gap, clinical context and mixed-disorder evaluation may be required.';return result;}
+const multiCheckFields=new Set(['dvt','hdSchedule']);
+function syncChecks(key){
+ const group=document.querySelector('[data-field="'+key+'"]');
+ const picked=[...group.querySelectorAll('input[type=checkbox]:checked')].map(x=>x.value);
+ const other=document.querySelector('[data-other="'+key+'"]');
+ if(other&&other.value.trim())picked.push(other.value.trim());
+ document.getElementById(key).value=picked.join('; ');
 }
-* { box-sizing: border-box; }
-body {
-  margin: 0;
-  font-family: 'Poppins', sans-serif;
-  /* 🌊 New gradient background */
-  background: linear-gradient(135deg, #89f7fe 0%, #66a6ff 100%);
-  color: var(--text);
-  min-height: 100vh;
+function chooseOption(box){
+ const group=box.closest('[data-field]');const key=group.dataset.field;
+ if(box.checked&&!multiCheckFields.has(key))group.querySelectorAll('input[type=checkbox]').forEach(x=>{if(x!==box)x.checked=false});
+ syncChecks(key);
 }
-header {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin: 40px auto;
-  padding: 24px 40px;
-  background: var(--glass);
-  border: 1px solid var(--border-glass);
-  border-radius: 50px;
-  backdrop-filter: blur(40px);
-  max-width: 1100px;
-  box-shadow: 0 40px 120px rgba(0,0,0,0.6), inset 0 0 40px rgba(255,255,255,0.15);
-}
-header h1 { font-size: 2.2em; color: var(--primary); }
-
-.button {
-  background: var(--primary);
-  color: white;
-  padding: 14px 28px;
-  border: none;
-  border-radius: 30px;
-  font-size: 14px;
-  cursor: pointer;
-  transition: all 0.4s;
-  box-shadow: 0 20px 60px rgba(0,122,204,0.8);
-}
-.button:hover { transform: translateY(-5px) scale(1.06); background:#005fa3; }
-
-.section {
-  background: var(--glass);
-  border: 1px solid var(--border-glass);
-  border-radius: 40px;
-  backdrop-filter: blur(30px);
-  padding: 32px;
-  margin: 30px auto;
-  max-width: 1100px;
-  box-shadow: 0 50px 140px rgba(0,0,0,0.7), inset 0 0 60px rgba(255,255,255,0.15);
-}
-.section h2 {
-  margin-top: 0;
-  margin-bottom: 20px;
-  color: var(--primary);
-}
-.cams {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 24px;
-}
-.cam-card {
-  border-radius: 30px;
-  overflow: hidden;
-  box-shadow: 0 30px 90px rgba(0,0,0,0.6);
-  background:#000;
-  height: 400px;   /* Bigger height */
-}
-.cam-card video, .cam-card img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-.controls {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 16px;
-  margin-top: 24px;
-}
-.status {
-  margin-top: 16px;
-  font-weight: 600;
-}
-</style>
-</head>
-<body>
-
-<header>
-  <h1>Ozzy's Garage + Cameras</h1>
-</header>
-
-<div class="section">
-  <h2>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-Camera 1 &nbsp; &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Doorbell Camera</h2>
-  <div class="cams">
-    <div class="cam-card">
-      <!-- Replace with your camera stream -->
-      <img src="http://CAMERA_1_URL/mjpg/video.mjpg" alt="Driveway Camera"/>
-    </div>
-    <div class="cam-card">
-      <img src="http://CAMERA_2_URL/mjpg/video.mjpg" alt="Garage Camera"/>
-    </div>
-     
-  </div>
-</div>
-<div class="section">
-  <h2>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-Camera 2 &nbsp; &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Camera 3</h2>
-  <div class="cams">
-    <div class="cam-card">
-      <img src="http://CAMERA_3_URL/mjpg/video.mjpg" alt="Driveway Camera"/>
-    </div>
-    <div class="cam-card">
-      <img src="http://CAMERA_4_URL/mjpg/video.mjpg" alt="Garage Camera"/>
-    </div>
-     
-  </div>
-</div>
-
-<div class="section">
-  <h2>Garage Controls</h2>
-  <div class="controls">
-    <button class="button" onclick="garageCommand('/open')">Open</button>
-    <button class="button" onclick="garageCommand('/close')">Close</button>
-    <button class="button" style="background:#e25555;" onclick="garageCommand('/stop')">Stop</button>
-    <button class="button" onclick="refreshStatus()">Refresh Status</button>
-  </div>
-  <div class="status">Status: <span id="garageStatus">Unknown</span></div>
-</div>
-<div class="section">
-  <h2>Light switches</h2>
-  <div class="controls">
-    <button class="button" onclick="garageCommand('/open')">Bed Room 1</button>
-    <button class="button" onclick="garageCommand('/open')">Bed Room 2</button>
-    <button class="button" onclick="garageCommand('/open')">Master Bed Room</button>
-     <button class="button" onclick="garageCommand('/open')">Living Room</button>
-     
-      <button class="button" onclick="garageCommand('/open')">Guest room</button>
-    <button class="button" onclick="garageCommand('/close')">Grage Light</button>
-    <button class="button" onclick="garageCommand('/open')">Outdoor Light 1</button>
-    <button class="button" onclick="garageCommand('/open')">Outdoor Light 2</button>
-  </div>
- 
-</div>
-<div class="section">
-  <h2>Doorbell</h2>
-  <button class="button" onclick="ringDoorbell()">Ring Doorbell</button>
-  <div class="status">Last rung: <span id="doorbellTime">—</span></div>
-</div>
-
-<script>
-const CONFIG = {
-  GARAGE_BASE: "/api/garage",  // e.g. http://192.168.1.50/api/garage
-  DOORBELL: "/api/doorbell"
-};
-
-async function garageCommand(path){
-  try {
-    const res = await fetch(CONFIG.GARAGE_BASE + path, {method:'POST'});
-    const data = await res.json().catch(()=>({}));
-    document.getElementById('garageStatus').innerText = data.state || 'Command Sent';
-  } catch(e){
-    document.getElementById('garageStatus').innerText = 'Error';
-    alert("Garage command failed");
-  }
+function restoreChecks(){
+ document.querySelectorAll('[data-field]').forEach(group=>{
+ const key=group.dataset.field;const saved=document.getElementById(key).value;
+ const parts=saved.split(';').map(x=>x.trim()).filter(Boolean);
+ const known=[...group.querySelectorAll('input[type=checkbox]')];
+ known.forEach(x=>x.checked=parts.includes(x.value));
+ const other=document.querySelector('[data-other="'+key+'"]');
+ if(other)other.value=parts.filter(x=>!known.some(y=>y.value===x)).join('; ');
+ });
 }
 
-async function refreshStatus(){
-  try {
-    const res = await fetch(CONFIG.GARAGE_BASE + "/status");
-    const data = await res.json();
-    document.getElementById('garageStatus').innerText = data.state;
-  } catch(e){
-    document.getElementById('garageStatus').innerText = 'Offline';
-  }
+// Live medication autocomplete via the free NLM RxTerms terminology service.
+// In Apps Script deployment, server-side UrlFetchApp avoids browser CORS restrictions.
+const MED_CACHE = new Map();
+// Offline fallback for previews or temporary API outages; not a complete drug database.
+const COMMON_MEDS = ['Norepinephrine','Vasopressin','Epinephrine','Phenylephrine','Dobutamine','Dopamine','Milrinone','Propofol','Dexmedetomidine','Fentanyl','Midazolam','Ketamine','Morphine','Hydromorphone','Oxycodone','Acetaminophen','Levetiracetam','Lacosamide','Valproic acid','Phenytoin','Lorazepam','Albuterol','Ipratropium','Budesonide','Methylprednisolone','Prednisone','Heparin','Enoxaparin','Apixaban','Warfarin','Insulin regular','Insulin glargine','Furosemide','Bumetanide','Metolazone','Vancomycin','Cefepime','Piperacillin/tazobactam','Meropenem','Ceftriaxone','Azithromycin','Levofloxacin','Metronidazole','Linezolid','Daptomycin','Micafungin','Fluconazole','Pantoprazole','Famotidine','Amiodarone','Metoprolol','Labetalol','Nicardipine'];
+function fallbackMeds(q){return COMMON_MEDS.filter(x=>x.toLowerCase().includes(q.toLowerCase())).slice(0,12);}
+const MED_TIMERS = new WeakMap();
+function medResults(input, query, names, error){
+ if(input.value.trim().toLowerCase() !== query.toLowerCase())return;
+ const editor=input.closest('.med-editor'),panel=editor.querySelector('.med-suggestions');
+ panel.replaceChildren();
+ if(error){names=fallbackMeds(query);const msg=document.createElement('div');msg.className='med-hint';msg.textContent='Live search unavailable — showing common medications. Open the deployed Apps Script URL for live results.';panel.append(msg);}
+ const unique=[...new Set(names)].slice(0,12);
+ unique.forEach(name=>{const btn=document.createElement('button');btn.type='button';btn.textContent=name;btn.onclick=()=>{input.value=name;panel.hidden=true;editor.querySelector('.med-dose').focus();};panel.append(btn);});
+ if(!unique.length && !error){const msg=document.createElement('div');msg.className='med-hint';msg.textContent='No matches found. You may enter the name manually.';panel.append(msg);}
+ panel.hidden=false;
 }
-
-async function ringDoorbell(){
-  try {
-    await fetch(CONFIG.DOORBELL, {method:'POST'});
-    document.getElementById('doorbellTime').innerText = new Date().toLocaleTimeString();
-  } catch(e){
-    alert("Doorbell failed");
-  }
+function suggestMeds(input){
+ const editor=input.closest('.med-editor'),panel=editor.querySelector('.med-suggestions'),q=input.value.trim();
+ clearTimeout(MED_TIMERS.get(input));
+ if(q.length<3){panel.hidden=true;panel.replaceChildren();return;}
+ if(MED_CACHE.has(q.toLowerCase())){medResults(input,q,MED_CACHE.get(q.toLowerCase()),false);return;}
+ panel.hidden=false;panel.textContent='Searching medication database…';
+ MED_TIMERS.set(input,setTimeout(()=>{
+  const success=names=>{const list=Array.isArray(names)?names:[];MED_CACHE.set(q.toLowerCase(),list);medResults(input,q,list,false);};
+  const failure=()=>medResults(input,q,[],true);
+  if(window.google?.script?.run){try{google.script.run.withSuccessHandler(success).withFailureHandler(failure).searchMedications(q);}catch(e){failure();}}
+  else{fetch('https://clinicaltables.nlm.nih.gov/api/rxterms/v3/search?terms='+encodeURIComponent(q)+'&maxList=12')
+   .then(r=>{if(!r.ok)throw Error('API unavailable');return r.json();})
+   .then(data=>success(Array.isArray(data[3])?data[3].map(x=>Array.isArray(x)?x[0]:x):[])).catch(failure);}
+ },280));
 }
-</script>
+function medKeydown(e,input){if(e.key==='Enter'){e.preventDefault();const first=input.closest('.med-editor').querySelector('.med-suggestions button');if(first&&!input.closest('.med-editor').querySelector('.med-suggestions').hidden)first.click();else input.closest('.med-editor').querySelector('.med-dose').focus();}if(e.key==='Escape')input.closest('.med-editor').querySelector('.med-suggestions').hidden=true;}
+function medRows(editor){return [...editor.querySelectorAll('.med-item')].map(el=>({name:el.dataset.name,dose:el.dataset.dose}));}
+function syncMed(editor){document.getElementById(editor.dataset.med).value=medRows(editor).map(x=>x.name+(x.dose?' — '+x.dose:'')).join('; ');}
+function renderMed(editor,name,dose){
+ const item=document.createElement('div');item.className='med-item';item.dataset.name=name;item.dataset.dose=dose;
+ const text=document.createElement('span');text.textContent=name+(dose?' — '+dose:'');
+ const remove=document.createElement('button');remove.type='button';remove.textContent='Remove';remove.setAttribute('aria-label','Remove '+name);remove.onclick=()=>{item.remove();syncMed(editor);};
+ item.append(text,remove);editor.querySelector('.med-items').append(item);
+}
+function addMed(button){const editor=button.closest('.med-editor'),search=editor.querySelector('.med-search'),dose=editor.querySelector('.med-dose');const name=search.value.trim();if(!name){search.focus();return;}renderMed(editor,name,dose.value.trim());syncMed(editor);search.value='';dose.value='';editor.querySelector('.med-suggestions').hidden=true;search.focus();}
+function restoreMeds(){document.querySelectorAll('.med-editor').forEach(editor=>{editor.querySelector('.med-items').replaceChildren();editor.querySelector('.med-search').value='';editor.querySelector('.med-dose').value='';editor.querySelector('.med-suggestions').hidden=true;const saved=document.getElementById(editor.dataset.med).value; saved.split(';').map(x=>x.trim()).filter(Boolean).forEach(entry=>{const parts=entry.split(/\s+[—–]\s+/);renderMed(editor,parts.shift(),parts.join(' — '));});});}
 
-</body>
-</html>
+function payload(){const data={recordId:currentId};for(const [,fields] of sections)for(const [k] of fields)data[k]=value(k);data.abgInterpretation=interpretABG();return data;}
+function status(s){document.getElementById('status').textContent=s;}
+function save(){if(!form.reportValidity())return;if(!window.google?.script?.run){status('Open the deployed Google Apps Script web app to save.');return;}status('Saving...');google.script.run.withSuccessHandler(r=>{currentId=r.recordId;status('Saved successfully.');loadList();}).withFailureHandler(e=>status('Save failed: '+e.message)).saveWorkup(payload());}
+function newRecord(){form.reset();currentId='';restoreMeds();restoreChecks();interpretABG();status('New blank workup.');}
+function loadList(){if(!window.google?.script?.run){status('Saved records are available in the deployed app.');return;}google.script.run.withSuccessHandler(rows=>{const sel=document.getElementById('saved');sel.replaceChildren(new Option('Select saved workup...',''));rows.forEach(r=>sel.add(new Option(`${r.patientCode || "Room not entered"} | ${r.updatedAt || "Saved workup"}`,r.recordId)));status(`${rows.length} saved workup(s).`);}).withFailureHandler(e=>status(e.message)).listWorkups();}
+function loadSelected(){const id=value('saved');if(!id)return;if(!window.google?.script?.run)return;status('Loading...');google.script.run.withSuccessHandler(data=>{currentId=data.recordId;for(const [,fields] of sections)for(const [k] of fields)document.getElementById(k).value=data[k]||'';restoreMeds();restoreChecks();interpretABG();status('Workup loaded.');}).withFailureHandler(e=>status(e.message)).getWorkup(id);}
+newRecord();if(window.google?.script?.run)loadList();
+</script></body></html>

@@ -94,6 +94,6 @@ function doPost(e) {
   }
   const html = '<!doctype html><html><body><script>parent.postMessage(' +
     JSON.stringify(reply).replace(/</g, '\\u003c') +
-    ', "*");<\\/script></body></html>';
+    ', "*");</scr' + 'ipt></body></html>';
   return HtmlService.createHtmlOutput(html);
 }

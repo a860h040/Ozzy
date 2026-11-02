@@ -76,3 +76,24 @@ function searchMedications(query) {
   cache.put(key,JSON.stringify(names),3600);
   return names;
 }
+/**
+ * Receives a form POST from the GitHub Pages version.
+ * Requires a newly deployed Apps Script web-app version.
+ * Never include patient data in the acknowledgement.
+ */
+function doPost(e) {
+  let reply;
+  try {
+    if (!e || !e.parameter || e.parameter.action !== 'saveWorkup') throw new Error('Invalid request');
+    const data = JSON.parse(e.parameter.payload || '{}');
+    if (!data || typeof data !== 'object' || Array.isArray(data)) throw new Error('Invalid workup');
+    const saved = saveWorkup(data);
+    reply = {type:'icu-workup-save-result', ok:true, recordId:saved.recordId};
+  } catch (err) {
+    reply = {type:'icu-workup-save-result', ok:false, error:String(err.message || err).slice(0,200)};
+  }
+  const html = '<!doctype html><html><body><script>parent.postMessage(' +
+    JSON.stringify(reply).replace(/</g, '\\u003c') +
+    ', "*");<\\/script></body></html>';
+  return HtmlService.createHtmlOutput(html);
+}

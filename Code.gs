@@ -9,7 +9,23 @@ const FIELDS = [
  ['dvt','DVT PPx'],['sup','SUP'],['wbc','WBC'],['mrsa','MRSA PCR'],['fever','Febrile/Afebrile'],['cultures','Cultures'],['antibiotics','Antibiotics'],['therapyDay','Day of Therapy'],['endDate','End Date'],['hdReceived','HD Received'],['hdSchedule','HD Schedule']
 ];
 function doGet() {
-  return ContentService.createTextOutput('ICU Workup backend is running. Open the form on GitHub Pages.').setMimeType(ContentService.MimeType.TEXT);
+  const html = `<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><title>Saved ICU Workups</title>
+  <style>body{font:14px Arial,sans-serif;color:#203244;margin:20px;background:#f5f6f7}main{max-width:950px;margin:auto;background:white;padding:20px;border:1px solid #ddd}h1{font-size:23px}button{background:#263f52;color:white;border:0;border-radius:4px;padding:9px 12px;margin:4px;cursor:pointer}input{padding:9px;border:1px solid #bbb}table{width:100%;border-collapse:collapse}td,th{padding:10px;border-bottom:1px solid #ddd;text-align:left;vertical-align:top}pre{white-space:pre-wrap;overflow-wrap:anywhere}#details{margin-top:20px} @media print{button,input,#list{display:none}body{background:white}main{border:0}}</style></head><body><main><h1>Saved ICU Workups</h1><p>Access is controlled by your Google Apps Script deployment permissions.</p><button onclick="refresh()">Refresh from Google Sheets</button><input id="q" placeholder="Search room number" oninput="render()"><button onclick="download()">Download CSV</button><span id="status"></span><div id="list"></div><div id="details"></div></main>
+  <script>
+  let records=[],selected=null;
+  const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\\u0027':'&#39;'}[c]));
+  const status=x=>document.getElementById('status').textContent=x;
+  function refresh(){status('Loading...');google.script.run.withSuccessHandler(rows=>{records=rows;render();status(rows.length+' records');}).withFailureHandler(e=>status(e.message)).listWorkups();}
+  function render(){const q=document.getElementById('q').value.toLowerCase();const rows=records.filter(r=>String(r.patientCode||'').toLowerCase().includes(q));document.getElementById('list').innerHTML='<table><thead><tr><th>Room</th><th>Last updated</th><th>View</th></tr></thead><tbody>'+rows.map(r=>'<tr><td>'+esc(r.patientCode)+'</td><td>'+esc(r.updatedAt)+'</td><td><button data-id="'+esc(r.recordId)+'" onclick="openRecord(this.dataset.id)">View</button></td></tr>').join('')+'</tbody></table>';}
+  function openRecord(id){status('Loading room...');google.script.run.withSuccessHandler(data=>{selected=data;document.getElementById('details').innerHTML='<h2>Room '+esc(data.patientCode)+'</h2><button onclick="window.print()">Print / Save PDF</button><table>'+Object.entries(data).filter(([k,v])=>v!==''&&v!=null).map(([k,v])=>'<tr><th>'+esc(k)+'</th><td>'+esc(v)+'</td></tr>').join('')+'</table>';status('Record loaded');}).withFailureHandler(e=>status(e.message)).getWorkup(id);}
+  function download(){status('Preparing export...');google.script.run.withSuccessHandler(rows=>{const csv=rows.map(r=>r.map(x=>'"'+String(x??'').replace(/"/g,'""')+'"').join(',')).join('\\r\\n');const blob=new Blob(['\\uFEFF'+csv],{type:'text/csv;charset=utf-8'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='icu-workups.csv';a.click();setTimeout(()=>URL.revokeObjectURL(url),3000);status('CSV downloaded');}).withFailureHandler(e=>status(e.message)).exportWorkups();}
+  refresh();
+  </scr`+`ipt></body></html>`;
+  return HtmlService.createHtmlOutput(html).setTitle('Saved ICU Workups').setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+}
+function exportWorkups() {
+  const sh=sheet_();
+  return sh.getDataRange().getDisplayValues();
 }
 function sheet_() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();

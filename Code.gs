@@ -8,7 +8,9 @@ const FIELDS = [
  ['bg','BG'],['insulin','Insulin'],['hgb','Hgb'],['hct','Hct'],['platelets','Platelets'],['scr','SCr'],['crcl','CrCl (mL/min)'],['rrt','RRT'],['hd','HD'],['crrt','CRRT'],['fluid24','Fluid Balance 24h'],['fluidTotal','Fluid Balance Total'],['acMeds','AC Meds'],['diuretics','Diuretics'],
  ['dvt','DVT PPx'],['sup','SUP'],['wbc','WBC'],['mrsa','MRSA PCR'],['fever','Febrile/Afebrile'],['cultures','Cultures'],['antibiotics','Antibiotics'],['therapyDay','Day of Therapy'],['endDate','End Date'],['hdReceived','HD Received'],['hdSchedule','HD Schedule']
 ];
-function doGet() { sheet_(); return HtmlService.createHtmlOutputFromFile('Index').setTitle('ICU Workup'); }
+function doGet() {
+  return ContentService.createTextOutput('ICU Workup backend is running. Open the form on GitHub Pages.').setMimeType(ContentService.MimeType.TEXT);
+}
 function sheet_() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   if (!ss) throw new Error('Bind this script to an approved Google Sheet.');

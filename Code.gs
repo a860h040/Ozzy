@@ -34,7 +34,7 @@ function doGet() {
     status('Saving changes...');
     google.script.run.withSuccessHandler(result=>{
       google.script.run.withSuccessHandler(data=>{selected=data;showRecord();refresh();status('Changes saved to Google Sheets.');}).withFailureHandler(e=>status('Saved, but refresh failed: '+e.message)).getWorkup(result.recordId);
-    }).withFailureHandler(e=>status('Update failed: '+e.message)).saveWorkup(updated);
+    }).withFailureHandler(e=>status('Update failed: '+e.message)).updateExistingWorkup(updated);
   }
   function printWorksheet(){
     if(!selected){status('Select a room first.');return;}
@@ -102,6 +102,22 @@ function saveWorkup(data) {
   if(target)sh.getRange(target,1,1,row.length).setValues([row]); else sh.appendRow(row);
   return {recordId:id,updatedAt:record.updatedAt};
 }
+// Update only an existing saved record. Never append a new row during editing.
+function updateExistingWorkup(data) {
+  if (!data || !data.recordId) throw new Error('Select a saved workup before editing.');
+  const sh=sheet_(), id=String(data.recordId), last=sh.getLastRow();
+  if(last<2) throw new Error('No saved workups found.');
+  const ids=sh.getRange(2,1,last-1,1).getDisplayValues().flat();
+  const idx=ids.indexOf(id);
+  if(idx<0) throw new Error('This record no longer exists. Refresh the saved workups.');
+  const current=sh.getRange(idx+2,1,1,FIELDS.length).getDisplayValues()[0];
+  const previous=Object.fromEntries(FIELDS.map(([key],i)=>[key,current[i]]));
+  if(data.updatedAt && previous.updatedAt !== String(data.updatedAt)) throw new Error('This workup was updated by another user. Refresh before editing.');
+  const record={...previous,...data,recordId:id,updatedAt:new Date().toISOString()};
+  sh.getRange(idx+2,1,1,FIELDS.length).setValues([FIELDS.map(([key])=>clean_(record[key]))]);
+  return {recordId:id,updatedAt:record.updatedAt};
+}
+
 function listWorkups(){
   const sh=sheet_(),last=sh.getLastRow();if(last<2)return [];
   const rows=sh.getRange(2,1,last-1,FIELDS.length).getDisplayValues();
